@@ -47,8 +47,8 @@ fi; \
 php -r "file_exists(\".env\") || copy(file_exists(\".env.dist\")?\".env.dist\":\".env.example\", \".env\");"; \
 php artisan key:generate --ansi || true; \
 php artisan storage:link || true; \
+php artisan optimize:clear || true; \
 '
-
 backend-migrate:
 	docker compose exec backend-php php artisan migrate
 
