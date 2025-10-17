@@ -27,7 +27,6 @@ init:
 	docker compose build backend-php
 	$(MAKE) up
 	$(MAKE) backend-new
-	$(MAKE) fix-perms
 	$(MAKE) backend-migrate
 	$(MAKE) seed-csv
 	$(MAKE) frontend-install
