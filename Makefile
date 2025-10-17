@@ -27,27 +27,26 @@ init:
 	docker compose build backend-php
 	$(MAKE) up
 	$(MAKE) backend-new
+	$(MAKE) fix-perms
 	$(MAKE) backend-migrate
-	$(MAKE) seed
+	$(MAKE) seed-csv
 	$(MAKE) frontend-install
 
 backend-new:
 	docker compose run --rm backend-php bash -lc '\
-set -e; \
-if [ ! -f artisan ]; then \
+set -e; cd /var/www/html; \
+if [ -f artisan ]; then \
+  if [ ! -f vendor/autoload.php ]; then \
+    composer install --no-interaction --prefer-dist; \
+  fi; \
+else \
   TMP=$$(mktemp -d); \
   composer create-project laravel/laravel:^12.0 $$TMP; \
   cd $$TMP && tar cf - . | (cd /var/www/html && tar xf -); \
   rm -rf $$TMP; \
 fi; \
-php -r "file_exists(\".env\") || copy(\".env.example\", \".env\");"; \
-php artisan key:generate; \
-sed -i "s/^DB_CONNECTION=.*/DB_CONNECTION=pgsql/" .env; \
-sed -i "s/^DB_HOST=.*/DB_HOST=db/" .env; \
-sed -i "s/^DB_PORT=.*/DB_PORT=5432/" .env; \
-sed -i "s/^DB_DATABASE=.*/DB_DATABASE=app/" .env; \
-sed -i "s/^DB_USERNAME=.*/DB_USERNAME=app/" .env; \
-sed-i "s/^DB_PASSWORD=.*/DB_PASSWORD=app/" .env || sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=app/" .env; \
+php -r "file_exists(\".env\") || copy(file_exists(\".env.dist\")?\".env.dist\":\".env.example\", \".env\");"; \
+php artisan key:generate --ansi || true; \
 php artisan storage:link || true; \
 '
 
@@ -87,3 +86,11 @@ cache-clear:
 
 rebuild:
 	docker compose build --no-cache backend-php
+
+fix-perms:
+	docker compose exec backend-php bash -lc '\
+	cd /var/www/html && \
+	mkdir -p storage/framework/{cache,data,sessions,testing,views} storage/logs bootstrap/cache && \
+	chown -R www-data:www-data storage bootstrap/cache && \
+	chmod -R ug+rwX storage bootstrap/cache \
+	'
