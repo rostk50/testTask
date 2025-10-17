@@ -13,14 +13,29 @@ bash:
 	docker compose exec backend-php sh
 
 env-copy:
-	[ -f .env ] || cp .env.dist .env || true
-	[ -f frontend/.env ] || cp frontend/.env.dist frontend/.env || true
-	docker compose run --rm backend-php sh -lc '\
-		cd /var/www/html; \
-		if [ ! -f .env ]; then \
-			if [ -f .env.dist ]; then cp .env.dist .env; \
-			elif [ -f .env.example ]; then cp .env.example .env; fi; \
-		fi'
+	@if [ -f .env ]; then \
+		echo "✓ root .env already exists"; \
+	elif [ -f .env.dist ]; then \
+		cp .env.dist .env && echo "→ created root .env from .env.dist"; \
+	elif [ -f .env.example ]; then \
+		cp .env.example .env && echo "→ created root .env from .env.example"; \
+	fi
+
+	@if [ -f backend/.env ]; then \
+		echo "✓ backend/.env already exists"; \
+	elif [ -f backend/.env.dist ]; then \
+		cp backend/.env.dist backend/.env && echo "→ created backend/.env from backend/.env.dist"; \
+	elif [ -f backend/.env.example ]; then \
+		cp backend/.env.example backend/.env && echo "→ created backend/.env from backend/.env.example"; \
+	fi
+
+	@if [ -f frontend/.env ]; then \
+		echo "✓ frontend/.env already exists"; \
+	elif [ -f frontend/.env.dist ]; then \
+		cp frontend/.env.dist frontend/.env && echo "→ created frontend/.env from frontend/.env.dist"; \
+	elif [ -f frontend/.env.example ]; then \
+		cp frontend/.env.example frontend/.env && echo "→ created frontend/.env from frontend/.env.example"; \
+	fi
 
 init:
 	$(MAKE) env-copy
