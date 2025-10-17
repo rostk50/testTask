@@ -27,7 +27,9 @@ init:
 	docker compose build backend-php
 	$(MAKE) up
 	$(MAKE) backend-new
+	$(MAKE) fix-perms
 	$(MAKE) backend-migrate
+	$(MAKE) cache-clear
 	$(MAKE) seed-csv
 	$(MAKE) frontend-install
 
@@ -47,8 +49,8 @@ fi; \
 php -r "file_exists(\".env\") || copy(file_exists(\".env.dist\")?\".env.dist\":\".env.example\", \".env\");"; \
 php artisan key:generate --ansi || true; \
 php artisan storage:link || true; \
-php artisan optimize:clear || true; \
 '
+
 backend-migrate:
 	docker compose exec backend-php php artisan migrate
 
@@ -80,8 +82,8 @@ qa:
 	$(MAKE) lint && $(MAKE) stan && $(MAKE) test-feature
 
 cache-clear:
-	docker compose exec backend-php php artisan optimize:clear
-	docker compose exec backend-php php -r 'opcache_reset();'
+	docker compose exec backend-php php artisan optimize:clear || true
+	docker compose exec backend-php php -r 'function_exists("opcache_reset") && opcache_reset();' || true
 
 rebuild:
 	docker compose build --no-cache backend-php
