@@ -1,0 +1,64 @@
+{
+  "info": {
+    "name": "Houses API",
+    "_postman_id": "f1b9c2e6-1234-4bcd-8123-abcdefabcdef",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List houses",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/api/houses",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "houses"
+          ],
+          "query": []
+        }
+      }
+    },
+    {
+      "name": "Filter example",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/api/houses?bedrooms=4&bathrooms=2&price_from=300000&price_to=500000",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "houses"
+          ],
+          "query": [
+            {
+              "key": "bedrooms",
+              "value": "4"
+            },
+            {
+              "key": "bathrooms",
+              "value": "2"
+            },
+            {
+              "key": "price_from",
+              "value": "300000"
+            },
+            {
+              "key": "price_to",
+              "value": "500000"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
